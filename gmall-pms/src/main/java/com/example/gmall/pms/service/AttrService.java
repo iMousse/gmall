@@ -16,5 +16,14 @@ import com.atguigu.core.bean.QueryCondition;
 public interface AttrService extends IService<AttrEntity> {
 
     PageVo queryPage(QueryCondition params);
+
+    /**
+     *
+     * @param queryCondition
+     * @param cid
+     * @param type
+     * @return
+     */
+    PageVo queryByCidAndType(QueryCondition queryCondition, Long cid, Integer type);
 }
 
