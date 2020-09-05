@@ -27,4 +27,21 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         return new PageVo(page);
     }
 
+    @Override
+    public PageVo getGroupByCidAndPage(QueryCondition condition, Long catId) {
+
+        QueryWrapper<AttrGroupEntity> wrapper = new QueryWrapper<>();
+
+        if (catId != null) {
+            wrapper.eq("catelog_id", catId);
+        }
+
+        IPage<AttrGroupEntity> page = this.page(
+                new Query<AttrGroupEntity>().getPage(condition),
+                wrapper
+        );
+
+        return new PageVo(page);
+    }
+
 }

@@ -8,6 +8,7 @@ import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +34,16 @@ public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
 
+    @ApiOperation("根据分类的id查询分类组的数据")
+    @ApiModelProperty(name = "catId",value = "分类id",required = true)
+    @GetMapping("{catId}")
+    public Resp<PageVo> queryGroupByPage(QueryCondition condition, @PathVariable("catId") Long catId) {
+
+        PageVo page = attrGroupService.getGroupByCidAndPage(condition, catId);
+
+        return Resp.ok(page);
+    }
+
     /**
      * 列表
      */
@@ -40,6 +51,7 @@ public class AttrGroupController {
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('pms:attrgroup:list')")
     public Resp<PageVo> list(QueryCondition queryCondition) {
+
         PageVo page = attrGroupService.queryPage(queryCondition);
 
         return Resp.ok(page);

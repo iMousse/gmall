@@ -1,4 +1,4 @@
-package com.example.gmall.pms.controller;
+ package com.example.gmall.pms.controller;
 
 import java.util.Arrays;
 import java.util.Map;

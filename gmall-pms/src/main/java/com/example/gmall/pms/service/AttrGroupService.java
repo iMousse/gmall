@@ -16,5 +16,13 @@ import com.atguigu.core.bean.QueryCondition;
 public interface AttrGroupService extends IService<AttrGroupEntity> {
 
     PageVo queryPage(QueryCondition params);
+
+    /**
+     * 根据分页条件和分类id查询分页参数
+     * @param condition  分页条件
+     * @param catId  分类id
+     * @return
+     */
+    PageVo getGroupByCidAndPage(QueryCondition condition, Long catId);
 }
 
