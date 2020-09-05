@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.gmall.pms.entity.AttrEntity;
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
+import com.example.gmall.pms.vo.AttrVO;
 
 
 /**
@@ -19,11 +20,26 @@ public interface AttrService extends IService<AttrEntity> {
 
     /**
      *
+     * 根据分类id和属性类型查询Attr
      * @param queryCondition
      * @param cid
      * @param type
      * @return
      */
     PageVo queryByCidAndType(QueryCondition queryCondition, Long cid, Integer type);
+
+    /**
+     * 维护属性组和属性的中间表
+     *
+     * @param attr
+     */
+    void saveAttr(AttrVO attr);
+
+    /**
+     * 维护属性组和属性的中间表
+     *
+     * @param attr
+     */
+    void updateAttrById(AttrVO attr);
 }
 

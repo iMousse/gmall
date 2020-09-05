@@ -5,6 +5,7 @@ import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
 import com.example.gmall.pms.entity.AttrEntity;
 import com.example.gmall.pms.service.AttrService;
+import com.example.gmall.pms.vo.AttrVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +70,8 @@ public class AttrController {
     @ApiOperation("保存")
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('pms:attr:save')")
-    public Resp<Object> save(@RequestBody AttrEntity attr) {
-        attrService.save(attr);
+    public Resp<Object> save(@RequestBody AttrVO attr) {
+        attrService.saveAttr(attr);
 
         return Resp.ok(null);
     }
@@ -81,8 +82,8 @@ public class AttrController {
     @ApiOperation("修改")
     @PostMapping("/update")
     @PreAuthorize("hasAuthority('pms:attr:update')")
-    public Resp<Object> update(@RequestBody AttrEntity attr) {
-        attrService.updateById(attr);
+    public Resp<Object> update(@RequestBody AttrVO attr) {
+        attrService.updateAttrById(attr);
 
         return Resp.ok(null);
     }
