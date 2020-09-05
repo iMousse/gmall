@@ -1,12 +1,15 @@
 package com.example.gmall.pms.controller;
 
+import java.security.acl.Group;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
+import com.example.gmall.pms.vo.GroupVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
@@ -17,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.gmall.pms.entity.AttrGroupEntity;
 import com.example.gmall.pms.service.AttrGroupService;
 
-
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -34,8 +37,18 @@ public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
 
+    @ApiOperation("根据属性组id查询和属性组相关的属性")
+    @ApiModelProperty(name = "gid", value = "分组id", required = true)
+    @GetMapping("withattr/{gid}")
+    public Resp<GroupVO> queryGorupWithAttrsByGid(@PathVariable("gid") Long gid) {
+
+        GroupVO groupsVOS = this.attrGroupService.queryGroupWIthAttrsByGid(gid);
+
+        return Resp.ok(groupsVOS);
+    }
+
     @ApiOperation("根据分类的id查询分类组的数据")
-    @ApiModelProperty(name = "catId",value = "分类id",required = true)
+    @ApiModelProperty(name = "catId", value = "分类id", required = true)
     @GetMapping("{catId}")
     public Resp<PageVo> queryGroupByPage(QueryCondition condition, @PathVariable("catId") Long catId) {
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.gmall.pms.entity.AttrGroupEntity;
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
+import com.example.gmall.pms.vo.GroupVO;
 
 
 /**
@@ -24,5 +25,12 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      * @return
      */
     PageVo getGroupByCidAndPage(QueryCondition condition, Long catId);
+
+    /**
+     * 通过分组id查询attrs
+     * @param gid 分组id
+     * @return
+     */
+    GroupVO queryGroupWIthAttrsByGid(Long gid);
 }
 
