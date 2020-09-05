@@ -5,6 +5,8 @@ import com.example.gmall.pms.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
 
+import java.util.List;
+
 
 /**
  * 属性&属性分组关联
@@ -16,5 +18,13 @@ import com.atguigu.core.bean.QueryCondition;
 public interface AttrAttrgroupRelationService extends IService<AttrAttrgroupRelationEntity> {
 
     PageVo queryPage(QueryCondition params);
+
+    /**
+     * 删除属性组和属性的关联关系
+     * @param relationEntities
+     * @return
+     */
+    int deleteRelation(List<AttrAttrgroupRelationEntity> relationEntities);
+
 }
 
