@@ -16,5 +16,13 @@ import com.atguigu.core.bean.QueryCondition;
 public interface SpuInfoService extends IService<SpuInfoEntity> {
 
     PageVo queryPage(QueryCondition params);
+
+    /**
+     * 根据查询条件和分类id查询spu
+     * @param condition
+     * @param cid
+     * @return
+     */
+    PageVo querySpuPage(QueryCondition condition, Long cid);
 }
 

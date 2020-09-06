@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * spu信息
@@ -56,10 +57,12 @@ public class SpuInfoEntity implements Serializable {
 	 * 
 	 */
 	@ApiModelProperty(name = "createTime",value = "")
+	@DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
 	private Date createTime;
 	/**
 	 * 
 	 */
+	@DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
 	@ApiModelProperty(name = "uodateTime",value = "")
 	private Date uodateTime;
 

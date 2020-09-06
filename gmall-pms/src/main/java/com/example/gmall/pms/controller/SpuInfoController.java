@@ -33,6 +33,15 @@ public class SpuInfoController {
     @Autowired
     private SpuInfoService spuInfoService;
 
+    @GetMapping
+    public Resp<PageVo> querySpuPage(QueryCondition condition, @RequestParam("catId") Long cid) {
+
+        PageVo pageVo = spuInfoService.querySpuPage(condition, cid);
+
+        return Resp.ok(pageVo);
+    }
+
+
     /**
      * 列表
      */
