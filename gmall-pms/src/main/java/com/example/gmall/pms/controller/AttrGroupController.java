@@ -1,9 +1,7 @@
 package com.example.gmall.pms.controller;
 
-import java.security.acl.Group;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 
 import com.atguigu.core.bean.PageVo;
@@ -20,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import com.example.gmall.pms.entity.AttrGroupEntity;
 import com.example.gmall.pms.service.AttrGroupService;
 
-import javax.servlet.http.HttpServletRequest;
-
 
 /**
  * 属性分组
@@ -37,12 +33,20 @@ public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
 
+    @GetMapping("withattrs/cat/{catId}")
+    public Resp<List<GroupVO>> queryGroupWithAttrsByCid(@PathVariable("catId") Long cid) {
+
+        List<GroupVO> list = this.attrGroupService.queryGroupWithAttrsByCid(cid);
+
+        return Resp.ok(list);
+    }
+
     @ApiOperation("根据属性组id查询和属性组相关的属性")
     @ApiModelProperty(name = "gid", value = "分组id", required = true)
     @GetMapping("withattr/{gid}")
-    public Resp<GroupVO> queryGorupWithAttrsByGid(@PathVariable("gid") Long gid) {
+    public Resp<GroupVO> queryGroupWithAttrsByGid(@PathVariable("gid") Long gid) {
 
-        GroupVO groupsVOS = this.attrGroupService.queryGroupWIthAttrsByGid(gid);
+        GroupVO groupsVOS = this.attrGroupService.queryGroupWithAttrsByGid(gid);
 
         return Resp.ok(groupsVOS);
     }

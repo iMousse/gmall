@@ -1,25 +1,22 @@
 package com.example.gmall.pms.service.impl;
 
+import com.atguigu.core.bean.PageVo;
+import com.atguigu.core.bean.Query;
+import com.atguigu.core.bean.QueryCondition;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.gmall.pms.dao.AttrAttrgroupRelationDao;
 import com.example.gmall.pms.dao.AttrDao;
+import com.example.gmall.pms.dao.AttrGroupDao;
 import com.example.gmall.pms.entity.AttrAttrgroupRelationEntity;
 import com.example.gmall.pms.entity.AttrEntity;
-import com.example.gmall.pms.service.AttrAttrgroupRelationService;
+import com.example.gmall.pms.entity.AttrGroupEntity;
+import com.example.gmall.pms.service.AttrGroupService;
 import com.example.gmall.pms.vo.GroupVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.atguigu.core.bean.PageVo;
-import com.atguigu.core.bean.Query;
-import com.atguigu.core.bean.QueryCondition;
-
-import com.example.gmall.pms.dao.AttrGroupDao;
-import com.example.gmall.pms.entity.AttrGroupEntity;
-import com.example.gmall.pms.service.AttrGroupService;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -64,7 +61,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     }
 
     @Override
-    public GroupVO queryGroupWIthAttrsByGid(Long gid) {
+    public GroupVO queryGroupWithAttrsByGid(Long gid) {
         GroupVO groupVO = new GroupVO();
 
         //查询group
@@ -74,10 +71,11 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         //查询关联关系，获取attrids
         List<AttrAttrgroupRelationEntity> relationEntities = relationDao.selectList(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", gid));
 
-        if (!CollectionUtils.isEmpty(relationEntities)) {
-            groupVO.setRelations(relationEntities);
+        if (CollectionUtils.isEmpty(relationEntities)) {
+            return groupVO;
         }
 
+        groupVO.setRelations(relationEntities);
         //根据attrids查询attr
         List<Long> attrIds = relationEntities.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
         List<AttrEntity> attrEntities = attrDao.selectBatchIds(attrIds);
@@ -85,6 +83,18 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
         //查询attrs
         return groupVO;
+    }
+
+    @Override
+    public List<GroupVO> queryGroupWithAttrsByCid(Long cid) {
+        //先通过cid获取group
+        List<AttrGroupEntity> groupEntityList = this.list(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", cid));
+
+        //将获取的group转换成groupVo
+        return groupEntityList.stream().map(attrGroupEntity ->
+                this.queryGroupWithAttrsByGid(attrGroupEntity.getAttrGroupId())
+        ).collect(Collectors.toList());
+
     }
 
 }
