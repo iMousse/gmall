@@ -6,15 +6,53 @@ import com.atguigu.core.bean.QueryCondition;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.gmall.pms.client.GmallSmsClient;
+import com.example.gmall.pms.dao.ProductAttrValueDao;
+import com.example.gmall.pms.dao.SkuInfoDao;
 import com.example.gmall.pms.dao.SpuInfoDao;
-import com.example.gmall.pms.entity.SpuInfoEntity;
+import com.example.gmall.pms.dao.SpuInfoDescDao;
+import com.example.gmall.pms.entity.*;
+import com.example.gmall.pms.service.ProductAttrValueService;
+import com.example.gmall.pms.service.SkuImagesService;
+import com.example.gmall.pms.service.SkuSaleAttrValueService;
 import com.example.gmall.pms.service.SpuInfoService;
+import com.example.gmall.pms.vo.BaseAttrVO;
+import com.example.gmall.pms.vo.SkuInfoVO;
+import com.example.gmall.pms.vo.SkuSaleVO;
+import com.example.gmall.pms.vo.SpuInfoVO;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service("spuInfoService")
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
+
+    @Autowired
+    private SpuInfoDescDao descDao;
+
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
+
+    @Autowired
+    private SkuInfoDao skuInfoDao;
+
+    @Autowired
+    private SkuImagesService skuImagesService;
+
+    @Autowired
+    private SkuSaleAttrValueService attrValueService;
+
+    @Autowired
+    private GmallSmsClient gmallSmsClient;
 
     @Override
     public PageVo queryPage(QueryCondition params) {
@@ -49,6 +87,97 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 wrapper
         );
         return new PageVo(page);
+    }
+
+    @Override
+    public int saveSkuInfo(SpuInfoVO spuInfoVO) {
+        //1.保存spu相关的3张表
+        //1.1 保存pms_spu_info
+        spuInfoVO.setId(null);
+        spuInfoVO.setCreateTime(new Date());
+        spuInfoVO.setUodateTime(spuInfoVO.getCreateTime());
+        this.save(spuInfoVO);
+
+        Long spuId = spuInfoVO.getId();
+        //1.2 保存pms_spu_info_desc
+        List<String> spuImages = spuInfoVO.getSpuImages();
+        if (!CollectionUtils.isEmpty(spuImages)) {
+            SpuInfoDescEntity descEntity = new SpuInfoDescEntity();
+            //数据库中spu_id不是主键，且这个表没有主键，所以需要单独设置TableId
+            descEntity.setSpuId(spuId);
+            descEntity.setDecript(StringUtils.join(spuImages, ","));
+            this.descDao.insert(descEntity);
+        }
+
+
+        //1.3 保存pms_product_attr_value
+        List<BaseAttrVO> baseAttrs = spuInfoVO.getBaseAttrs();
+        if (!CollectionUtils.isEmpty(baseAttrs)) {
+            //批量保存
+            this.productAttrValueService.saveBatch(
+                    //数据强转
+                    baseAttrs.stream().map(baseAttrVO -> {
+                        //设置spuId
+                        baseAttrVO.setSpuId(spuId);
+                        return (ProductAttrValueEntity) baseAttrVO;})
+                            .collect(Collectors.toList()));
+        }
+
+
+        List<SkuInfoVO> skus = spuInfoVO.getSkus();
+        if (CollectionUtils.isEmpty(skus)) {
+            return 0;
+        }
+        skus.forEach(sku -> {
+            //2.保存pms_sku相关的3张表
+            //2.1 保存pms_sku_info
+            sku.setSpuId(spuId);
+            sku.setSkuCode(UUID.randomUUID().toString());
+            sku.setBrandId(spuInfoVO.getBrandId());
+            sku.setCatalogId(spuInfoVO.getCatalogId());
+            List<String> images = sku.getImages();
+            if (!CollectionUtils.isEmpty(images)) {
+                sku.setSkuDefaultImg(StringUtils.isNotBlank(sku.getSkuDefaultImg()) ? sku.getSkuDefaultImg() : images.get(0));
+            }
+
+            this.skuInfoDao.insert(sku);
+
+            //获取skuId
+            Long skuId = sku.getSkuId();
+
+            //2.2 保存pms_sku_images
+            if (!CollectionUtils.isEmpty(images)) {
+                List<SkuImagesEntity> imagesEntities = images.stream().map(image -> {
+                    SkuImagesEntity imagesEntity = new SkuImagesEntity();
+                    imagesEntity.setImgUrl(image);
+                    imagesEntity.setSkuId(skuId);
+                    //设置默认图片，1为默认图片，0为不是
+                    imagesEntity.setDefaultImg(StringUtils.equals(sku.getSkuDefaultImg(), image) ? 1 : 0);
+
+                    return imagesEntity;
+                }).collect(Collectors.toList());
+
+                this.skuImagesService.saveBatch(imagesEntities);
+            }
+
+            //2.3 保存pms_sku_sale_attr_value
+            List<SkuSaleAttrValueEntity> saleAttrs = sku.getSaleAttrs();
+            if (!CollectionUtils.isEmpty(saleAttrs)) {
+                saleAttrs.forEach(saleAttr -> saleAttr.setSkuId(skuId));
+                attrValueService.saveBatch(saleAttrs);
+            }
+
+            //3.保存sms_sku信息的3张表 feign远程调用
+            //3.1 保存sms_sku_bounds
+            //3.2 保存sms_sku_ladder
+            //3.3 保存sms_sku_full_reduction
+            SkuSaleVO skuSaleVO = new SkuSaleVO();
+            BeanUtils.copyProperties(sku, skuSaleVO);
+            skuSaleVO.setSkuId(skuId);
+            this.gmallSmsClient.saveSales(skuSaleVO);
+        });
+
+        return 0;
     }
 
 }

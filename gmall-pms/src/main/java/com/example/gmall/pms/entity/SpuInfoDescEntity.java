@@ -1,5 +1,6 @@
 package com.example.gmall.pms.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
@@ -24,8 +25,8 @@ public class SpuInfoDescEntity implements Serializable {
 	/**
 	 * 商品id
 	 */
-	@TableId
-	@ApiModelProperty(name = "spuId",value = "商品id")
+	@TableId(type = IdType.INPUT)
+	@ApiModelProperty(name = "spuId", value = "商品id")
 	private Long spuId;
 	/**
 	 * 商品介绍

@@ -7,6 +7,7 @@ import java.util.Map;
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
+import com.example.gmall.sms.vo.SkuSaleVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.gmall.sms.entity.SkuBoundsEntity;
 import com.example.gmall.sms.service.SkuBoundsService;
-
-
 
 
 /**
@@ -33,12 +32,21 @@ public class SkuBoundsController {
     @Autowired
     private SkuBoundsService skuBoundsService;
 
+    @PostMapping("/sku/sale/save")
+    public Resp<Object> saveSales(@RequestBody SkuSaleVO skuSaleVO) {
+
+        skuBoundsService.saveSales(skuSaleVO);
+
+        return Resp.ok("成功");
+    }
+
     /**
      * 列表
      */
     @ApiOperation("分页查询(排序)")
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('sms:skubounds:list')")
+
     public Resp<PageVo> list(QueryCondition queryCondition) {
         PageVo page = skuBoundsService.queryPage(queryCondition);
 
@@ -52,8 +60,8 @@ public class SkuBoundsController {
     @ApiOperation("详情查询")
     @GetMapping("/info/{id}")
     @PreAuthorize("hasAuthority('sms:skubounds:info')")
-    public Resp<SkuBoundsEntity> info(@PathVariable("id") Long id){
-		SkuBoundsEntity skuBounds = skuBoundsService.getById(id);
+    public Resp<SkuBoundsEntity> info(@PathVariable("id") Long id) {
+        SkuBoundsEntity skuBounds = skuBoundsService.getById(id);
 
         return Resp.ok(skuBounds);
     }
@@ -64,8 +72,8 @@ public class SkuBoundsController {
     @ApiOperation("保存")
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('sms:skubounds:save')")
-    public Resp<Object> save(@RequestBody SkuBoundsEntity skuBounds){
-		skuBoundsService.save(skuBounds);
+    public Resp<Object> save(@RequestBody SkuBoundsEntity skuBounds) {
+        skuBoundsService.save(skuBounds);
 
         return Resp.ok(null);
     }
@@ -76,8 +84,8 @@ public class SkuBoundsController {
     @ApiOperation("修改")
     @PostMapping("/update")
     @PreAuthorize("hasAuthority('sms:skubounds:update')")
-    public Resp<Object> update(@RequestBody SkuBoundsEntity skuBounds){
-		skuBoundsService.updateById(skuBounds);
+    public Resp<Object> update(@RequestBody SkuBoundsEntity skuBounds) {
+        skuBoundsService.updateById(skuBounds);
 
         return Resp.ok(null);
     }
@@ -88,8 +96,8 @@ public class SkuBoundsController {
     @ApiOperation("删除")
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sms:skubounds:delete')")
-    public Resp<Object> delete(@RequestBody Long[] ids){
-		skuBoundsService.removeByIds(Arrays.asList(ids));
+    public Resp<Object> delete(@RequestBody Long[] ids) {
+        skuBoundsService.removeByIds(Arrays.asList(ids));
 
         return Resp.ok(null);
     }
