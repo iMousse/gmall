@@ -17,3 +17,6 @@ mybatis-plus:
     db-config:
       id-type: auto
   mapper-locations: classpath:mapper/sms/**/*.xml
+logging:
+  level:
+    com.example.gmall.sms.**: debug
