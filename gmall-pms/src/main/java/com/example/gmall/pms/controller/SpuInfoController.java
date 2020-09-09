@@ -1,7 +1,6 @@
 package com.example.gmall.pms.controller;
 
 import java.util.Arrays;
-import java.util.Map;
 
 
 import com.atguigu.core.bean.PageVo;
@@ -75,7 +74,7 @@ public class SpuInfoController {
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('pms:spuinfo:save')")
     public Resp<Object> save(@RequestBody SpuInfoVO spuInfo){
-		spuInfoService.saveSkuInfo(spuInfo);
+		spuInfoService.saveSpuInfo(spuInfo);
 
         return Resp.ok(null);
     }

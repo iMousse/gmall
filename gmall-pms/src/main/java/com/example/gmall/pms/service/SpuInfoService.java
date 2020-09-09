@@ -31,6 +31,6 @@ public interface SpuInfoService extends IService<SpuInfoEntity> {
      * @param spuInfo
      * @return
      */
-    int saveSkuInfo(SpuInfoVO spuInfo);
+    void saveSpuInfo(SpuInfoVO spuInfo);
 }
 
