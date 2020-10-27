@@ -1,6 +1,7 @@
 package com.example.gmall.pms.controller;
 
 import java.util.Arrays;
+import java.util.List;
 
 
 import com.atguigu.core.bean.PageVo;
@@ -42,6 +43,12 @@ public class SpuInfoController {
     }
 
 
+    @PostMapping("page")
+    public Resp<List<SpuInfoEntity>> querySpusByPage(@RequestBody QueryCondition condition) {
+        PageVo page = spuInfoService.queryPage(condition);
+        List<SpuInfoEntity> list = (List<SpuInfoEntity>) page.getList();
+        return Resp.ok(list);
+    }
     /**
      * 列表
      */
