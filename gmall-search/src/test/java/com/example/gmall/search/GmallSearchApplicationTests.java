@@ -9,6 +9,8 @@ import com.example.gmall.search.client.GmallWmsClient;
 import com.example.gmall.search.pojo.Goods;
 import com.example.gmall.search.pojo.SearchAttr;
 import com.example.gmall.search.repository.GoodsRepository;
+import com.example.gmall.search.service.SearchService;
+import com.example.gmall.search.vo.SearchParamVO;
 import com.example.gmall.wms.entity.WareSkuEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,10 +37,31 @@ class GmallSearchApplicationTests {
     @Autowired
     private GoodsRepository goodsRepository;
 
+    @Autowired
+    private SearchService searchService;
+
     @Test
     void createIndex() {
+        this.restTemplate.deleteIndex(Goods.class);
         this.restTemplate.createIndex(Goods.class);
         this.restTemplate.putMapping(Goods.class);
+    }
+
+
+    /**
+     * http://localhost:8086/search?catelog3=225&brand=5&order=2:asc/desc&priceFrom=0&priceTo=10000&pageNum=1&pageSize=12&keyword=iPhone
+     * @throws IOException
+     */
+    @Test
+    void searchTest() throws IOException {
+        SearchParamVO searchParamVO = new SearchParamVO();
+        searchParamVO.setKeyword("iPhone");
+        searchParamVO.setBrand(new String[]{"5"});
+        searchParamVO.setCatelog3(new String[]{"225"});
+        searchParamVO.setOrder("1:desc");
+        searchParamVO.setPriceFrom(0);
+        searchParamVO.setPriceTo(5000);
+        System.out.println(searchService.search(searchParamVO));
     }
 
     /**

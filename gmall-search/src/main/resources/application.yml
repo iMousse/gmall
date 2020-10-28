@@ -8,3 +8,5 @@ spring:
   elasticsearch:
     rest:
       uris: http://122.51.221.202:9200
+  jackson:
+    default-property-inclusion: non_null
