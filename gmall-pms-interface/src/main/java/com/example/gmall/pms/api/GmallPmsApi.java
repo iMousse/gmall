@@ -3,10 +3,7 @@ package com.example.gmall.pms.api;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
 import com.example.gmall.pms.entity.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -41,6 +38,17 @@ public interface GmallPmsApi {
     @GetMapping("pms/productattrvalue/{spuId}")
     Resp<List<ProductAttrValueEntity>> querySearchAttrValueBySpuId(@PathVariable("spuId") Long spuId);
 
+
+    /**
+     * 查询分类
+     *
+     * @param level
+     * @param pid
+     * @return
+     */
+    @GetMapping("pms/category")
+    Resp<List<CategoryEntity>> queryByCategoriesByPidOrLevel(@RequestParam(value = "level", defaultValue = "0") Integer level,
+                                                             @RequestParam(value = "parentCid", required = false) Long pid);
 
 
 }

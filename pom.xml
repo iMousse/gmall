@@ -14,6 +14,7 @@
         <module>gmall-admin</module>
         <module>gmall-gateway</module>
         <module>gmall-generator</module>
+        <module>gmall-index</module>
         <module>gmall-oms</module>
         <module>gmall-pms</module>
         <module>gmall-sms</module>

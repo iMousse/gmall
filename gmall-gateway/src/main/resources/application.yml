@@ -29,6 +29,12 @@ spring:
           uri: lb://sms-service
           predicates:
             - Path=/sms/**
+        - id: index-route # 首页管理路由
+          uri: lb://index-service
+          predicates:
+            - Path=/api/index/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment} # 重写前缀，去掉/api
         - id: search-route  # 搜索服务路由
           uri: lb://search-service
           predicates:
