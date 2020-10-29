@@ -22,6 +22,10 @@ public interface GmallPmsApi {
     Resp<List<SpuInfoEntity>> querySpusByPage(@RequestBody QueryCondition condition);
 
 
+    @GetMapping("pms/spuinfo/info/{id}")
+    Resp<SpuInfoEntity> querySpuById(@PathVariable("id") Long id);
+
+
     @GetMapping("pms/skuinfo/{spuId}")
     Resp<List<SkuInfoEntity>> querySkusBySpuId(@PathVariable("spuId") Long spuId);
 
@@ -36,4 +40,7 @@ public interface GmallPmsApi {
 
     @GetMapping("pms/productattrvalue/{spuId}")
     Resp<List<ProductAttrValueEntity>> querySearchAttrValueBySpuId(@PathVariable("spuId") Long spuId);
+
+
+
 }

@@ -42,7 +42,6 @@ class GmallSearchApplicationTests {
 
     @Test
     void createIndex() {
-        this.restTemplate.deleteIndex(Goods.class);
         this.restTemplate.createIndex(Goods.class);
         this.restTemplate.putMapping(Goods.class);
     }

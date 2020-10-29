@@ -18,9 +18,11 @@ import com.example.gmall.pms.vo.SpuInfoVO;
 import com.example.gmall.sms.vo.SkuSaleVO;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,8 +55,15 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     @Autowired
     private GmallSmsClient gmallSmsClient;
 
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
+    @Value("${item.rabbitmq.exchange}")
+    private String EXCHANGE_NAME;
+
     @Override
     public PageVo queryPage(QueryCondition params) {
+
         IPage<SpuInfoEntity> page = this.page(
                 new Query<SpuInfoEntity>().getPage(params),
                 new QueryWrapper<SpuInfoEntity>()
@@ -107,7 +116,13 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
 
         this.saveSkuInfoWhtiSaleInfo(spuInfoVO);
-        
+
+
+        sendMsg("insert", spuInfoVO.getId());
+    }
+
+    private void sendMsg(String type, Long spuId) {
+        this.amqpTemplate.convertAndSend(EXCHANGE_NAME, "item." + type, spuId);
     }
 
     private void saveSpuBaseAttrs(SpuInfoVO spuInfoVO) {

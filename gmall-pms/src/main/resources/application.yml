@@ -17,3 +17,15 @@
 #    db-config:
 #      id-type: auto
 #  mapper-locations: classpath:mapper/pms/**/*.xml
+spring:
+  rabbitmq:
+    host: 122.51.221.202
+    username: mousse
+    password: abc123
+    virtual-host: /mousse
+    port: 5672
+    template:
+      exchange: GMALL-PMS-EXCHANGE
+item:
+  rabbitmq:
+    exchange: GMALL-PMS-EXCHANGE

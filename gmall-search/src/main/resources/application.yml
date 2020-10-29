@@ -10,3 +10,11 @@ spring:
       uris: http://122.51.221.202:9200
   jackson:
     default-property-inclusion: non_null
+  rabbitmq:
+    host: 122.51.221.202
+    username: mousse
+    password: abc123
+    virtual-host: /mousse
+    port: 5672
+    template:
+      exchange: GMALL-PMS-EXCHANGE
