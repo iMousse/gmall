@@ -17,4 +17,13 @@
     </resultMap>
 
 
+    <resultMap type="com.example.gmall.pms.vo.CategoryVO" id="categoryVOMap" extends="categoryMap">
+        <collection property="subs" javaType="List" ofType="com.example.gmall.pms.entity.CategoryEntity" select="querySubCategories" column="cat_id"/>
+    </resultMap>
+
+    <select id="querySubCategories" resultMap="categoryVOMap">
+        select *
+        from pms_category
+        where parent_cid = #{pid};
+    </select>
 </mapper>

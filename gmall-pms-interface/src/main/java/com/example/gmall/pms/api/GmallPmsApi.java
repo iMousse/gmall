@@ -3,6 +3,7 @@ package com.example.gmall.pms.api;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
 import com.example.gmall.pms.entity.*;
+import com.example.gmall.pms.vo.CategoryVO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,6 +50,10 @@ public interface GmallPmsApi {
     @GetMapping("pms/category")
     Resp<List<CategoryEntity>> queryByCategoriesByPidOrLevel(@RequestParam(value = "level", defaultValue = "0") Integer level,
                                                              @RequestParam(value = "parentCid", required = false) Long pid);
+
+
+    @GetMapping("pms/category/{pid}")
+    Resp<List<CategoryVO>> querySubCategories(@PathVariable("pid") Long pid);
 
 
 }
