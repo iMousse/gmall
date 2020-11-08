@@ -52,7 +52,7 @@ public class SpuInfoDescController {
     @ApiOperation("详情查询")
     @GetMapping("/info/{spuId}")
     @PreAuthorize("hasAuthority('pms:spuinfodesc:info')")
-    public Resp<SpuInfoDescEntity> info(@PathVariable("spuId") Long spuId){
+    public Resp<SpuInfoDescEntity> querySpuDescBySpuId(@PathVariable("spuId") Long spuId){
 		SpuInfoDescEntity spuInfoDesc = spuInfoDescService.getById(spuId);
 
         return Resp.ok(spuInfoDesc);

@@ -9,11 +9,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.gmall.pms.dao.AttrAttrgroupRelationDao;
 import com.example.gmall.pms.dao.AttrDao;
 import com.example.gmall.pms.dao.AttrGroupDao;
+import com.example.gmall.pms.dao.ProductAttrValueDao;
 import com.example.gmall.pms.entity.AttrAttrgroupRelationEntity;
 import com.example.gmall.pms.entity.AttrEntity;
 import com.example.gmall.pms.entity.AttrGroupEntity;
+import com.example.gmall.pms.entity.ProductAttrValueEntity;
 import com.example.gmall.pms.service.AttrGroupService;
 import com.example.gmall.pms.vo.GroupVO;
+import com.example.gmall.pms.vo.ItemGroupVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Autowired
     private AttrDao attrDao;
+
+    @Autowired
+    private ProductAttrValueDao attrValueDao;
 
 
     @Override
@@ -95,6 +101,23 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                 this.queryGroupWithAttrsByGid(attrGroupEntity.getAttrGroupId())
         ).collect(Collectors.toList());
 
+    }
+
+    @Override
+    public List<ItemGroupVO> queryItemGroupVOByCidAndSpuId(Long cid, Long spuId) {
+        List<AttrGroupEntity> attrGroupEntities = this.list(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", cid));
+
+        return attrGroupEntities.stream().map(group -> {
+            ItemGroupVO itemGroupVO = new ItemGroupVO();
+
+            itemGroupVO.setName(group.getAttrGroupName());
+
+            List<AttrAttrgroupRelationEntity> relationEntities = this.relationDao.selectList(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", group.getAttrGroupId()));
+            List<Long> attrIds = relationEntities.stream().map(AttrAttrgroupRelationEntity::getAttrGroupId).collect(Collectors.toList());
+            List<ProductAttrValueEntity> productAttrValueEntities = this.attrValueDao.selectList(new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId).in("attr_id", attrIds));
+            itemGroupVO.setBaseAttrs(productAttrValueEntities);
+            return itemGroupVO;
+        }).collect(Collectors.toList());
     }
 
 }

@@ -1,12 +1,14 @@
 package com.example.gmall.sms.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.core.bean.Resp;
+import com.example.gmall.sms.vo.SaleVO;
 import com.example.gmall.sms.vo.SkuSaleVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +33,12 @@ import com.example.gmall.sms.service.SkuBoundsService;
 public class SkuBoundsController {
     @Autowired
     private SkuBoundsService skuBoundsService;
+
+    @GetMapping("{skuId}")
+    public Resp<List<SaleVO>> querySkuSalesBySkuId(@PathVariable("skuId") Long skuId) {
+        List<SaleVO> saleVOS = this.skuBoundsService.querySaleBySKuId(skuId);
+        return Resp.ok(saleVOS);
+    }
 
     @PostMapping("/sku/sale/save")
     public Resp<Object> saveSales(@RequestBody SkuSaleVO skuSaleVO) {

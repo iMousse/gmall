@@ -5,6 +5,8 @@ import com.example.gmall.pms.entity.SkuSaleAttrValueEntity;
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
 
+import java.util.List;
+
 
 /**
  * sku销售属性&值
@@ -16,5 +18,12 @@ import com.atguigu.core.bean.QueryCondition;
 public interface SkuSaleAttrValueService extends IService<SkuSaleAttrValueEntity> {
 
     PageVo queryPage(QueryCondition params);
+
+    /**
+     * 根据spuId查询sku销售属性
+     * @param spuId
+     * @return
+     */
+    List<SkuSaleAttrValueEntity> querySkuSaleAttrValueBySpuId(Long spuId);
 }
 

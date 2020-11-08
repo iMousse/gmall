@@ -1,6 +1,7 @@
 package com.example.gmall.pms.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -46,14 +47,20 @@ public class SkuSaleAttrValueController {
     }
 
 
+    @GetMapping("{spuId}")
+    public Resp<List<SkuSaleAttrValueEntity>> querySkuSaleAttrValueBySpuId(@PathVariable("spuId") Long spuId) {
+        List<SkuSaleAttrValueEntity>  skuSaleAttrValueEntities = this.skuSaleAttrValueService.querySkuSaleAttrValueBySpuId(spuId);
+        return Resp.ok(skuSaleAttrValueEntities);
+    }
+
     /**
      * 信息
      */
     @ApiOperation("详情查询")
     @GetMapping("/info/{id}")
     @PreAuthorize("hasAuthority('pms:skusaleattrvalue:info')")
-    public Resp<SkuSaleAttrValueEntity> info(@PathVariable("id") Long id){
-		SkuSaleAttrValueEntity skuSaleAttrValue = skuSaleAttrValueService.getById(id);
+    public Resp<SkuSaleAttrValueEntity> info(@PathVariable("id") Long id) {
+        SkuSaleAttrValueEntity skuSaleAttrValue = skuSaleAttrValueService.getById(id);
 
         return Resp.ok(skuSaleAttrValue);
     }

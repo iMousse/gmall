@@ -2,14 +2,21 @@ package com.example.gmall.sms.api;
 
 
 import com.atguigu.core.bean.Resp;
+import com.example.gmall.sms.vo.SaleVO;
 import com.example.gmall.sms.vo.SkuSaleVO;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 
 public interface GmallSmsApi {
 
-    @PostMapping("/sms/skubounds/sku/sale/save")
+    @PostMapping("sms/skubounds/sku/sale/save")
     Resp<Object> saveSales(@RequestBody SkuSaleVO skuSaleVO);
 
+    @GetMapping("sms/skubounds/{skuId}")
+    Resp<List<SaleVO>> querySkuSalesBySkuId(@PathVariable("skuId") Long skuId);
 }

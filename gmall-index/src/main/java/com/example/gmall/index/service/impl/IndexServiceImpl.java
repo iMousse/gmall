@@ -44,7 +44,7 @@ public class IndexServiceImpl implements IndexService {
     /**
      * <p>缓存雪崩:大量缓存同时失效，导致大量请求访问MySQL数据库。解决方法：过期时间 + 随机值</p>
      * <p>缓存穿透:大量的请求同时访问不存在的数据。解决方法：把查询结果为null的数据也放入缓存</p>
-     * <p>缓存击穿:有一个key缓存中没有，大量请求同时访问改key对应的数据。解决方法：分布式锁</p>
+     * <p>缓存击穿:有一个key缓存中没有，大量请求同时访问该key对应的数据。解决方法：分布式锁</p>
      */
     @Override
     @GmallCache(prefix = KEY_PREFIX, timeout = 5, random = 100)

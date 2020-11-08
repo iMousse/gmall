@@ -5,6 +5,7 @@ import com.example.gmall.pms.entity.AttrGroupEntity;
 import com.atguigu.core.bean.PageVo;
 import com.atguigu.core.bean.QueryCondition;
 import com.example.gmall.pms.vo.GroupVO;
+import com.example.gmall.pms.vo.ItemGroupVO;
 
 import java.util.List;
 
@@ -41,5 +42,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      * @return
      */
     List<GroupVO> queryGroupWithAttrsByCid(Long cid);
+
+    List<ItemGroupVO> queryItemGroupVOByCidAndSpuId(Long cid, Long spuId);
 }
 
