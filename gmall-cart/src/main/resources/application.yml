@@ -1,0 +1,15 @@
+server:
+  port: 8090
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  redis:
+    host: localhost
+gmall:
+  jwt:
+    pubKeyPath: E:\ideProject\rsa\rsa.pub # 公钥地址
+    cookieName: GMALL_TOKEN # cookie的名称
+    userKeyName: user-key # 未登录购物车的唯一标识
+    expire: 43200 # 过期时间，一个月

@@ -53,9 +53,15 @@ spring:
             - Path=/api/item/**
           filters:
             - RewritePath=/api/(?<segment>.*), /$\{segment} # 重写前缀，去掉/api
-        - id: auth-route # 商品详情路由
+        - id: auth-route # 权限详情路由
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment} # 重写前缀，去掉/api
+        - id: cart-route # 购物车详情路由
+          uri: lb://cart-service
+          predicates:
+            - Path=/api/cart/**
           filters:
             - RewritePath=/api/(?<segment>.*), /$\{segment} # 重写前缀，去掉/api
