@@ -1,5 +1,9 @@
 server:
   port: 8888
+gmall:
+  jwt:
+    pubKeyPath: E:\ideProject\rsa\rsa.pub # 公钥地址
+    cookieName: GMALL_TOKEN # cookie的名称
 spring:
   application:
     name: gmall-gateway
@@ -13,6 +17,8 @@ spring:
           uri: lb://pms-service
           predicates:
             - Path=/pms/**
+          filters:
+            - Auth
         - id: oms-route # 订单管理路由
           uri: lb://oms-service
           predicates:
@@ -45,5 +51,11 @@ spring:
           uri: lb://item-service
           predicates:
             - Path=/api/item/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment} # 重写前缀，去掉/api
+        - id: auth-route # 商品详情路由
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
           filters:
             - RewritePath=/api/(?<segment>.*), /$\{segment} # 重写前缀，去掉/api
