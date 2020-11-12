@@ -21,7 +21,7 @@ public class JwtProperties {
     @PostConstruct
     public void init() {
         try {
-            RsaUtils.getPublicKey(pubKeyPath);
+            this.publicKey = RsaUtils.getPublicKey(pubKeyPath);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("获取公钥路径错误");

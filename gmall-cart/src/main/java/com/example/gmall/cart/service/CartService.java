@@ -17,4 +17,11 @@ public interface CartService {
      */
     List<Cart> getCart();
 
+    /**
+     * 更新购物车
+     * @param cart
+     */
+    void updateCart(Cart cart);
+
+    void deleteCart(Long skuId);
 }

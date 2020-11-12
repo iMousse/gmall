@@ -28,4 +28,18 @@ public class CartController {
         List<Cart> carts = this.cartService.getCart();
         return Resp.ok(carts);
     }
+
+    @PostMapping("update")
+    public Resp<Object> updateCart(@RequestBody Cart cart) {
+        this.cartService.updateCart(cart);
+        return Resp.ok("更新成功");
+    }
+
+    @PostMapping("{skuId}")
+    public Resp<Object> deleteCart(@PathVariable("skuId")Long skuId){
+
+        this.cartService.deleteCart(skuId);
+
+        return Resp.ok(null);
+    }
 }
