@@ -1,0 +1,17 @@
+server:
+  port: 8091
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  rabbitmq:
+    host: 122.51.221.202
+    username: mousse
+    password: abc123
+    virtual-host: /mousse
+gmall:
+  jwt:
+    pubKeyPath: E:\ideProject\rsa\rsa.pub # 公钥地址
+    cookieName: GMALL_TOKEN # cookie的名称
+    expire: 43200 # 过期时间，一个月

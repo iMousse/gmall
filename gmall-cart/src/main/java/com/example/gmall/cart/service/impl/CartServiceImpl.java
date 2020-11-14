@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class CartServiceImpl implements CartService {
 
     private static final String CART_PREFIX_KEY = "gmall:cart:";
+    private static final String PRICE_PREFIX_KEY = "gmall:sku:price";
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -72,7 +74,10 @@ public class CartServiceImpl implements CartService {
             if (!CollectionUtils.isEmpty(wareSkuEntities)) {
                 cart.setStore(wareSkuEntities.stream().anyMatch(wareSkuEntity -> wareSkuEntity.getStock() > 0));
             }
+            //将当前价格放入redis中
+            this.redisTemplate.opsForValue().set(PRICE_PREFIX_KEY + skuId, skuInfo.getPrice().toString());
         }
+
 
         hashOps.put(skuId, JSON.toJSONString(cart));//重新写入redis
 
@@ -91,7 +96,12 @@ public class CartServiceImpl implements CartService {
         List<Object> cartJsonList = unloginHashOps.values();
 
         if (!CollectionUtils.isEmpty(cartJsonList)) {
-            unloginCartList = cartJsonList.stream().map(cartJson -> JSON.parseObject(cartJson.toString(), Cart.class)).collect(Collectors.toList());
+            unloginCartList = cartJsonList.stream().map(cartJson ->{
+                Cart cart = JSON.parseObject(cartJson.toString(), Cart.class);
+                String currentPrice = this.redisTemplate.opsForValue().get(PRICE_PREFIX_KEY + cart.getSkuId());
+                cart.setCurrentPrice(new BigDecimal(currentPrice));
+                return cart;
+            }).collect(Collectors.toList());
         }
 
         if (userInfo.getId() == null) {
@@ -115,7 +125,13 @@ public class CartServiceImpl implements CartService {
         }
 
         List<Object> loginCartJSONList = loginHashOps.values();
-        return loginCartJSONList.stream().map(cartJSON -> JSON.parseObject(cartJSON.toString(), Cart.class)).collect(Collectors.toList());
+        return loginCartJSONList.stream().map(cartJSON -> {
+            Cart cart = JSON.parseObject(cartJSON.toString(), Cart.class);
+            //查询当前价格
+            String currentPrice = this.redisTemplate.opsForValue().get(PRICE_PREFIX_KEY + cart.getSkuId());
+            cart.setCurrentPrice(new BigDecimal(currentPrice));
+            return cart;
+        }).collect(Collectors.toList());
 
 
     }

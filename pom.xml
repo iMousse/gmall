@@ -13,10 +13,15 @@
         <module>gmall-core</module>
         <module>gmall-auth</module>
         <module>gmall-admin</module>
+        <module>gmall-cart</module>
+        <module>gmall-cart-interface</module>
         <module>gmall-gateway</module>
         <module>gmall-generator</module>
         <module>gmall-index</module>
+        <module>gmall-item</module>
         <module>gmall-oms</module>
+        <module>gmall-oms-interface</module>
+        <module>gmall-order</module>
         <module>gmall-pms</module>
         <module>gmall-pms-interface</module>
         <module>gmall-sms</module>
@@ -26,6 +31,8 @@
         <module>gmall-wms</module>
         <module>gmall-wms-interface</module>
         <module>gmall-search</module>
+        <module>gmall-oms-interface</module>
+        <module>gmall-cart-interface</module>
     </modules>
 
 </project>
