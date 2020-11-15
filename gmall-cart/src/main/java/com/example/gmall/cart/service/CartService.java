@@ -1,6 +1,7 @@
 package com.example.gmall.cart.service;
 
-import com.example.gmall.cart.pojo.Cart;
+
+import com.example.gmall.cart.vo.Cart;
 
 import java.util.List;
 
@@ -24,4 +25,11 @@ public interface CartService {
     void updateCart(Cart cart);
 
     void deleteCart(Long skuId);
+
+    /**
+     * 根据用户id查询选中的商品
+     * @param userId
+     * @return
+     */
+    List<Cart> queryCheckedByUserId(Long userId);
 }

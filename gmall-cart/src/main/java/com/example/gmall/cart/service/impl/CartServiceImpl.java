@@ -1,15 +1,16 @@
 package com.example.gmall.cart.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.atguigu.core.bean.UserInfo;
 import com.example.gmall.cart.client.GmallPmsClient;
 import com.example.gmall.cart.client.GmallSmsClient;
 import com.example.gmall.cart.client.GmallWmsClient;
 import com.example.gmall.cart.interceptor.LoginInterceptor;
-import com.example.gmall.cart.pojo.Cart;
-import com.example.gmall.cart.pojo.UserInfo;
 import com.example.gmall.cart.service.CartService;
+import com.example.gmall.cart.vo.Cart;
 import com.example.gmall.pms.entity.SkuInfoEntity;
 import com.example.gmall.wms.entity.WareSkuEntity;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class CartServiceImpl implements CartService {
 
     private static final String CART_PREFIX_KEY = "gmall:cart:";
-    private static final String PRICE_PREFIX_KEY = "gmall:sku:price";
+    private static final String PRICE_PREFIX_KEY = "gmall:sku:price:";
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -96,10 +96,12 @@ public class CartServiceImpl implements CartService {
         List<Object> cartJsonList = unloginHashOps.values();
 
         if (!CollectionUtils.isEmpty(cartJsonList)) {
-            unloginCartList = cartJsonList.stream().map(cartJson ->{
+            unloginCartList = cartJsonList.stream().map(cartJson -> {
                 Cart cart = JSON.parseObject(cartJson.toString(), Cart.class);
                 String currentPrice = this.redisTemplate.opsForValue().get(PRICE_PREFIX_KEY + cart.getSkuId());
-                cart.setCurrentPrice(new BigDecimal(currentPrice));
+                if (StringUtils.isNotBlank(currentPrice)) {
+                    cart.setCurrentPrice(new BigDecimal(currentPrice));
+                }
                 return cart;
             }).collect(Collectors.toList());
         }
@@ -176,4 +178,17 @@ public class CartServiceImpl implements CartService {
         BoundHashOperations<String, Object, Object> hashOperations = this.redisTemplate.boundHashOps(key);
         hashOperations.delete(skuId.toString());
     }
+
+    @Override
+    public List<Cart> queryCheckedByUserId(Long userId) {
+        BoundHashOperations<String, Object, Object> hashOps = this.redisTemplate.boundHashOps(CART_PREFIX_KEY + userId);
+        List<Object> cartJsonList = hashOps.values();
+        if (CollectionUtils.isEmpty(cartJsonList)) {
+            return null;
+        }
+        return cartJsonList.stream().map(cartJson -> {
+            return JSON.parseObject(cartJson.toString(), Cart.class);
+        }).filter(Cart::getCheck).collect(Collectors.toList());
+    }
+
 }
