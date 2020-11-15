@@ -1,5 +1,6 @@
 package com.example.gmallorder.vo;
 
+import com.example.gmall.oms.vo.OrderItemVO;
 import com.example.gmall.ums.entity.MemberReceiveAddressEntity;
 import lombok.Data;
 

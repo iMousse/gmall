@@ -1,4 +1,4 @@
-package com.example.gmallorder.vo;
+package com.example.gmall.oms.vo;
 
 import com.example.gmall.pms.entity.SkuSaleAttrValueEntity;
 import com.example.gmall.sms.vo.SaleVO;

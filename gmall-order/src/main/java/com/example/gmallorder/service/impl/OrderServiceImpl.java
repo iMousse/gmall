@@ -1,5 +1,6 @@
 package com.example.gmallorder.service.impl;
 
+import com.atguigu.core.bean.Resp;
 import com.atguigu.core.bean.UserInfo;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.example.gmall.cart.vo.Cart;
@@ -8,17 +9,22 @@ import com.example.gmall.pms.entity.SkuSaleAttrValueEntity;
 import com.example.gmall.ums.entity.MemberEntity;
 import com.example.gmall.ums.entity.MemberReceiveAddressEntity;
 import com.example.gmall.wms.entity.WareSkuEntity;
+import com.example.gmall.wms.vo.SkuLockVO;
 import com.example.gmallorder.client.*;
 import com.example.gmallorder.interceptor.LoginInterceptor;
 import com.example.gmallorder.service.OrderService;
 import com.example.gmallorder.vo.OrderConfirmVO;
-import com.example.gmallorder.vo.OrderItemVO;
+import com.example.gmall.oms.vo.OrderItemVO;
+import com.example.gmall.oms.vo.OrderSubmitVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -27,6 +33,7 @@ import java.util.stream.Collectors;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private static final String ORDER_TOKEN_PREFIX = "order:token:";
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -119,12 +126,65 @@ public class OrderServiceImpl implements OrderService {
 
         //生成一个唯一标志，防止重复提交,(页面一份，Redis一份)
         CompletableFuture<Void> tokenCompletableFuture = CompletableFuture.runAsync(() -> {
-            String idStr = IdWorker.getIdStr();
-            orderConfirm.setOrderToken(idStr);
+            String orderToken = IdWorker.getIdStr();
+            orderConfirm.setOrderToken(orderToken);
+            redisTemplate.opsForValue().set(ORDER_TOKEN_PREFIX + orderToken, orderToken);
         }, threadPoolExecutor);
 
         CompletableFuture.allOf(addressCompletableFuture, skuCompletableFuture, tokenCompletableFuture,memberCompletableFuture).join();
 
         return orderConfirm;
+    }
+
+    @Override
+    public void submit(OrderSubmitVO submitVO) {
+        //1.防止重复提交，如果第一次则放行并删除redis的token，如果不是第一次则返回
+
+        String orderToken = submitVO.getOrderToken();
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+        //必须原子性，这里使用的是lua脚本
+        Long flag = this.redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Arrays.asList(ORDER_TOKEN_PREFIX + orderToken), orderToken);
+        if (flag == 0) {
+            throw new RuntimeException("订单不可重复提交");
+        }
+
+        //2.校验商品总价格
+        List<OrderItemVO> items = submitVO.getOrderItems();
+        BigDecimal totalPrice = submitVO.getTotalPrice();
+        if (CollectionUtils.isEmpty(items)) {
+            throw new RuntimeException("没有勾选需要购买的商品");
+        }
+
+        BigDecimal currentTotalPrice = items.stream().map(item -> {
+            SkuInfoEntity skuInfo = this.pmsClient.querySkuInfoBySkuId(item.getSkuId()).getData();
+            if (skuInfo != null) {
+                return skuInfo.getPrice().multiply(new BigDecimal(item.getCount()));
+            }
+
+            return new BigDecimal(0);
+        }).reduce((a, b) -> a.add(b)).get();
+
+        if (currentTotalPrice.compareTo(totalPrice) != 0) {
+            throw new RuntimeException("页面已过期，请刷新页面后重新下单");
+        }
+
+
+        //3.校验库存并锁定，一次性提示所有库存不够的商品信息
+        List<SkuLockVO> lockVOS = items.stream().map( item->{
+            SkuLockVO skuLockVO = new SkuLockVO();
+            skuLockVO.setSkuId(item.getSkuId());
+            skuLockVO.setCount(item.getCount());
+            return skuLockVO;
+        }).collect(Collectors.toList());
+        Resp wareResp = this.wmsClient.checkAndLockStore(lockVOS);
+        if (wareResp.getCode() != 0) {
+            throw new RuntimeException(wareResp.getMsg());
+        }
+
+
+        //4.生成订单信息
+
+
+        //5.通过消息队列删除购物车，1-4是强一致性，而最后一步不需要强制执行，如果通过Feign远程调用则强一致性
     }
 }
