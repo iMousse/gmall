@@ -38,7 +38,7 @@ public class WareSkuController {
 
 
     @PostMapping
-    public Resp checkAndLockStore(@RequestBody List<SkuLockVO> skuLockVOS) {
+    Resp<Object> checkAndLockStore(@RequestBody List<SkuLockVO> skuLockVOS) {
         String msg = this.wareSkuService.checkAndLockStore(skuLockVOS);
         if (StringUtils.isEmpty(msg)) {
             return Resp.ok(null);

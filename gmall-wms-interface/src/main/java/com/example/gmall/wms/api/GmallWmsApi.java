@@ -17,6 +17,6 @@ public interface GmallWmsApi {
 
 
     @PostMapping("wms/waresku")
-    Resp checkAndLockStore(@RequestBody List<SkuLockVO> skuLockVOS);
+    Resp<Object> checkAndLockStore(@RequestBody List<SkuLockVO> skuLockVOS);
 
 }

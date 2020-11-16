@@ -7,6 +7,11 @@ spring:
         server-addr: 127.0.0.1:8848
   redis:
     host: localhost
+  rabbitmq:
+    host: 122.51.221.202
+    username: mousse
+    password: abc123
+    virtual-host: /mousse
 gmall:
   jwt:
     pubKeyPath: E:\ideProject\rsa\rsa.pub # 公钥地址
