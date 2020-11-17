@@ -22,12 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -139,6 +139,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void submit(OrderSubmitVO submitVO) {
 
         //1.防止重复提交，如果第一次则放行并删除redis的token，如果不是第一次则返回
@@ -176,6 +177,7 @@ public class OrderServiceImpl implements OrderService {
             SkuLockVO skuLockVO = new SkuLockVO();
             skuLockVO.setSkuId(item.getSkuId());
             skuLockVO.setCount(item.getCount());
+            skuLockVO.setOrderToken(orderToken);
             return skuLockVO;
         }).collect(Collectors.toList());
         Resp<Object> wareResp = this.wmsClient.checkAndLockStore(lockVOS);
@@ -188,16 +190,36 @@ public class OrderServiceImpl implements OrderService {
         //4.生成订单信息
         Long id = LoginInterceptor.getUserInfo().getId();
 
-        OrderEntity data = this.omsClient.saveOrder(submitVO, id).getData();
-        if (data == null) {
+        try {
+
+            this.omsClient.saveOrder(submitVO, id);//定时解锁库存，如果失败
+
+        } catch (Exception e) {
+            e.printStackTrace();
+                /*
+            分布式事务问题，如果数据为空则解锁库存，
+            seata的分布式事务可以解决，但是由于是二次提交所以性能很低
+            这里我们采取消息事务的最终一致性
+             */
+            //发送消息队列到wms，解锁相应的库存
+            this.amqpTemplate.convertAndSend("GMALL-ORDER-EXCHANGE","stock.unlock", orderToken);
             throw new RuntimeException("服务器错误，创建订单失败");
         }
+
 
         //5.通过消息队列删除购物车，1-4是强一致性，而最后一步不需要强制执行，如果通过Feign远程调用则强一致性
         Map<String, Object> map = new HashMap<>();
         map.put("userId", id);
         map.put("skuIds", items.stream().map(OrderItemVO::getSkuId).collect(Collectors.toList()));
-        this.amqpTemplate.convertAndSend("cart.delete", map);
+        this.amqpTemplate.convertAndSend("GMALL-ORDER-EXCHANGE", "cart.delete", map);
+
+    }
+
+    public static void main(String[] args) {
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            System.out.println("这是一个定时任务");
+        }, 10, 20, TimeUnit.SECONDS);
 
     }
 }

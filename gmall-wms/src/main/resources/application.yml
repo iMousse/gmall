@@ -12,6 +12,13 @@ spring:
     password: abc123
   redis:
     host: 127.0.0.1
+  rabbitmq:
+    host: 122.51.221.202
+    username: mousse
+    password: abc123
+    virtual-host: /mousse
+    template:
+      exchange: GMALL-ORDER-EXCHANGE
 mybatis-plus:
   global-config:
     db-config:

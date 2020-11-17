@@ -1,9 +1,12 @@
 package com.example.gmall.wms.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.example.gmall.wms.vo.SkuLockVO;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +32,12 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     private RedissonClient redissonClient;
     @Autowired
     private WareSkuDao wareSkuDao;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
+    private static final String ORDER_PREFIX_KEY = "stock:lock:";
 
     @Override
     public PageVo queryPage(QueryCondition params) {
@@ -66,6 +75,13 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             List<Long> skuIds = unlockSku.stream().map(SkuLockVO::getSkuId).collect(Collectors.toList());
             return "下单失败，商品库存不足:" + skuIds.toString();
         }
+
+        String orderToken = skuLockVOS.get(0).getOrderToken();
+        this.redisTemplate.opsForValue().set(ORDER_PREFIX_KEY + orderToken, JSON.toJSONString(skuLockVOS));
+
+        //锁定成功，发送延时消息，定时解锁
+        this.amqpTemplate.convertAndSend("GMALL-ORDER-EXCHANGE","stock-ttl");
+
         return null;
     }
 
