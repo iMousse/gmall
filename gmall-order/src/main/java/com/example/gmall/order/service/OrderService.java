@@ -1,6 +1,6 @@
-package com.example.gmallorder.service;
+package com.example.gmall.order.service;
 
-import com.example.gmallorder.vo.OrderConfirmVO;
+import com.example.gmall.order.vo.OrderConfirmVO;
 import com.example.gmall.oms.vo.OrderSubmitVO;
 
 public interface OrderService {

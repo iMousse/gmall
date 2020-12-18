@@ -1,4 +1,4 @@
-package com.example.gmallorder.client;
+package com.example.gmall.order.client;
 
 import com.example.gmall.pms.api.GmallPmsApi;
 import org.springframework.cloud.openfeign.FeignClient;

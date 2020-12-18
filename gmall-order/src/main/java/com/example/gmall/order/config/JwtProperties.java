@@ -1,4 +1,4 @@
-package com.example.gmallorder.config;
+package com.example.gmall.order.config;
 
 import com.atguigu.core.utils.RsaUtils;
 import lombok.Data;

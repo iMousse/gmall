@@ -1,4 +1,4 @@
-package com.example.gmallorder.vo;
+package com.example.gmall.order.vo;
 
 import com.example.gmall.oms.vo.OrderItemVO;
 import com.example.gmall.ums.entity.MemberReceiveAddressEntity;

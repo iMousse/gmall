@@ -45,7 +45,6 @@ public class SearchService {
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
-    private static final Gson gson = new Gson();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public SearchResponseVO search(SearchParamVO searchParamVO) throws IOException {
@@ -158,6 +157,9 @@ public class SearchService {
     }
 
     /**
+     * 构建条件查询
+     * search?catelog3=手机&catelog3=配件&brand=1&props=43:3g-4g-5g&props=45:4.7-5.0&order=2:asc/desc&priceFrom=100&priceTo=10000&pageNum=1&pageSize=12&keyword=手机
+     *
      * @param searchParamVO
      * @return
      */
@@ -261,11 +263,11 @@ public class SearchService {
                         .subAggregation(AggregationBuilders.terms("attrNameAgg").field("attrList.attrName")
                                 .subAggregation(AggregationBuilders.terms("attrValueAgg").field("attrList.attrValue")))));
 
-        log.info("searchRequest:{}", sourceBuilder.toString());
 
         //6. 结果集过滤
         sourceBuilder.fetchSource(new String[]{"skuId","pic","title","price"}, null);
 
+        log.info("searchRequest:{}", sourceBuilder.toString());
         //查询参数
         SearchRequest searchRequest = new SearchRequest("goods").types("info");
         searchRequest.source(sourceBuilder);

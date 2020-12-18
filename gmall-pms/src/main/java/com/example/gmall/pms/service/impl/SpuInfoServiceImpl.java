@@ -122,7 +122,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     }
 
     private void sendMsg(String type, Long spuId) {
-        this.amqpTemplate.convertAndSend(EXCHANGE_NAME, "item." + type, spuId);
+        this.amqpTemplate.convertAndSend("GMALL-PMS-EXCHANGE", "item." + type, spuId);
     }
 
     private void saveSpuBaseAttrs(SpuInfoVO spuInfoVO) {

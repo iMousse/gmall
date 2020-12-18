@@ -1,4 +1,4 @@
-package com.example.gmallorder.interceptor;
+package com.example.gmall.order.interceptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

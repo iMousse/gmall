@@ -1,9 +1,9 @@
-package com.example.gmallorder.interceptor;
+package com.example.gmall.order.interceptor;
 
 import com.atguigu.core.bean.UserInfo;
 import com.atguigu.core.utils.CookieUtils;
 import com.atguigu.core.utils.JwtUtils;
-import com.example.gmallorder.config.JwtProperties;
+import com.example.gmall.order.config.JwtProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
