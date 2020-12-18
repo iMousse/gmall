@@ -1,9 +1,9 @@
-package com.example.gmallorder.controller;
+package com.example.gmall.order.controller;
 
 
 import com.atguigu.core.bean.Resp;
-import com.example.gmallorder.service.OrderService;
-import com.example.gmallorder.vo.OrderConfirmVO;
+import com.example.gmall.order.service.OrderService;
+import com.example.gmall.order.vo.OrderConfirmVO;
 import com.example.gmall.oms.vo.OrderSubmitVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -1,4 +1,4 @@
-package com.example.gmallorder;
+package com.example.gmall.order;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

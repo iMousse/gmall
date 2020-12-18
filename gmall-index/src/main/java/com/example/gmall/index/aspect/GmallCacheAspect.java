@@ -27,6 +27,10 @@ public class GmallCacheAspect {
 
     /**
      * 环绕通知的4个必要条件
+     *      1.返回值object
+     *      2.参数proceedingJoinPoint
+     *      3.抛出异常Throwable
+     *      4.proceedingJoinPoint.proceed(args)执行业务方法
      * @param point
      * @return
      */

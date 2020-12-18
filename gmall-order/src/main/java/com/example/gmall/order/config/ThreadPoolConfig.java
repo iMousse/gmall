@@ -1,4 +1,4 @@
-package com.example.gmallorder.config;
+package com.example.gmall.order.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,22 +1,21 @@
-package com.example.gmallorder.service.impl;
+package com.example.gmall.order.service.impl;
 
 import com.atguigu.core.bean.Resp;
 import com.atguigu.core.bean.UserInfo;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.example.gmall.cart.vo.Cart;
-import com.example.gmall.oms.entity.OrderEntity;
 import com.example.gmall.oms.vo.OrderItemVO;
 import com.example.gmall.oms.vo.OrderSubmitVO;
+import com.example.gmall.order.client.*;
+import com.example.gmall.order.interceptor.LoginInterceptor;
 import com.example.gmall.pms.entity.SkuInfoEntity;
 import com.example.gmall.pms.entity.SkuSaleAttrValueEntity;
 import com.example.gmall.ums.entity.MemberEntity;
 import com.example.gmall.ums.entity.MemberReceiveAddressEntity;
 import com.example.gmall.wms.entity.WareSkuEntity;
 import com.example.gmall.wms.vo.SkuLockVO;
-import com.example.gmallorder.client.*;
-import com.example.gmallorder.interceptor.LoginInterceptor;
-import com.example.gmallorder.service.OrderService;
-import com.example.gmallorder.vo.OrderConfirmVO;
+import com.example.gmall.order.service.OrderService;
+import com.example.gmall.order.vo.OrderConfirmVO;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
